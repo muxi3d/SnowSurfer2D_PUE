@@ -12,11 +12,12 @@ public class FinishLine : MonoBehaviour
             
             finishParticle.Play();
             //reload scene
-            Invoke("ReloadScene", 2f);
+            Invoke("GoToMainMenu", 2f);
         }
     }
-    private void ReloadScene()
+   
+    private void GoToMainMenu()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene("Menu");
     }
 }

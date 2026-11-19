@@ -3,9 +3,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
+    [Header("Player Movement Settings")]
     [SerializeField] private float boostMultiplier = 20f;
     [SerializeField] private float baseSpeed = 15f;
+    [Header("Score Manager")]
     [SerializeField] private ScoreManager scoreManager;
+    [Header("Pause Menu")]
+    [SerializeField] private GameObject pauseMenuPanel;
+    
     Rigidbody2D rb;
     SurfaceEffector2D surfaceEffector2D;
     InputAction moveAction;
@@ -14,8 +19,16 @@ public class PlayerController : MonoBehaviour
     int flipcount;
     float totalRotation;
     float previousRotation;
+    private bool isPaused = false;
     void Start()
     {
+        // Ensure the game is not paused when starting
+        Time.timeScale = 1f;
+        //Active the selected character based on the index stored in PlayerPrefs
+        int selectedCharacterIndex = PlayerPrefs.GetInt("SelectedCharacter", 0);
+        //Activate the selected character sprite based on the index
+        transform.GetChild(0).GetChild(selectedCharacterIndex).gameObject.SetActive(true);
+
         moveAction = InputSystem.actions.FindAction("Move");
         rb = GetComponent<Rigidbody2D>();
         surfaceEffector2D = FindAnyObjectByType<SurfaceEffector2D>();
@@ -23,10 +36,28 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            TogglePause();
+        }
         RotatePlayer();
         BoostPlayer();
         CalculateFlips();
     }
+
+    private void TogglePause()
+    {
+        isPaused = !isPaused;
+        pauseMenuPanel.SetActive(isPaused);
+        Time.timeScale = isPaused ? 0f : 1f; // Pause or resume the game
+    }
+    private void ResumeGame()
+    {
+        isPaused = false;
+        pauseMenuPanel.SetActive(false);
+        Time.timeScale = 1f; // Resume the game
+    }
+
     // Method to boost the player's speed based on movement input
     private void BoostPlayer()
     {
